@@ -58,12 +58,44 @@ function run() {
 				console.log(state.variables);
 			});
 		}
-		if (lines[i].startsWith('Début')) {
+		if (lines[i].startsWith('Début') || lines[i].startsWith('Debut')) {
 			state.isBeforeStart = false;
 		}
 		if (lines[i].startsWith('Fin')) {
 			break;
 		}
+		if (lines[i].toLowerCase().startsWith('fonction')) {
+			const functionKeyword = lines[i].split(' ')[0];
+			const functionName = lines[i].replace(functionKeyword, '').split('(')[0].trim();
+			if (state.variables[functionName]) {
+				result = 'Erreur: la fonction ' + functionName + ' est déjà déclarée.';
+			}
+			state.variables[functionName] = { type: 'fonction', value: null, isArray: false, isFunction: true};
+		}
+		if (lines[i].toLowerCase().startsWith('procedure')) {
+			const procedureKeyword = lines[i].split(' ')[0];
+			const procedureName = lines[i].replace(procedureKeyword, '').split('(')[0].trim();
+			if (state.variables[procedureName]) {
+				result = 'Erreur: la procédure ' + procedureName + ' est déjà déclarée.';
+			}
+			state.variables[procedureName] = { type: 'procedure', value: null, isArray: false, isFunction: true};
+		}
+		if (lines[i].includes('<-')) {
+			const [name, value] = lines[i].split('<-');
+			if(!state.variables[name]) {
+				result = 'Erreur: la variable ' + name + ' n\'est pas déclarée.';
+			}
+			state.variables[name].value = value;
+		}
+		if (lines[i].includes('ecrire')) {
+			const name = lines[i].replace('ecrire(', '').replace(')', '');
+			if(!name) {
+				result = 'Erreur: la valeur à afficher est manquante.';
+			} else {
+				result += state.variables[name].value + '\n';
+			}
+		}
+
 		
 	}
 	output.innerHTML = result;
