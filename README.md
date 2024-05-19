@@ -1,2 +1,2 @@
 # algo
-Une compilateur de la language algorithmique
+Une interpreture web de la language algorithmique
